@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-let scene, camera,renderer;
+let scene, camera,renderer,pointLight;
 
 scene = new THREE.Scene();
 
@@ -25,5 +25,12 @@ scene.add(ballMesh);
 let directionalLight = new THREE.DirectionalLight(0xffffff, 2);
 directionalLight.position.set(1, 1, 1);
 scene.add(directionalLight);
+
+pointLight = new THREE.PointLight(0xffffff, 1);
+pointLight.position.set(-200, -200, -200);
+scene.add(pointLight);
+
+let pointLightHelper = new THREE.PointLightHelper(pointLight, 30);
+scene.add(pointLightHelper);
 
 renderer.render(scene,camera);
