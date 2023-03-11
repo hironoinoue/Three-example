@@ -1,6 +1,7 @@
 import * as THREE from "three";
+import {OrbitControls} from "./jsm/controls/OrbitControls.js";
 
-let scene, camera,renderer,pointLight;
+let scene, camera,renderer,pointLight,controls;
 
 scene = new THREE.Scene();
 
@@ -33,6 +34,8 @@ scene.add(pointLight);
 let pointLightHelper = new THREE.PointLightHelper(pointLight, 30);
 scene.add(pointLightHelper);
 
+
+controls = new OrbitControls(camera, renderer.domElement);
 function animate() {
   pointLight.position.set(
     200 * Math.sin (Date.now() / 500),
