@@ -1,46 +1,71 @@
 import * as THREE from "three";
 import { OrbitControls } from "./jsm/controls/OrbitControls.js";
+import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.15/+esm";
+
+//UIデバッグ
+const gui = new GUI();
 
 //サイズ
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
 
 //シーン
 const scene = new THREE.Scene();
 
-const geometry = new THREE.BoxGeometry(1, 1, 1, 5, 5, 5);
-const materila = new THREE.MeshBasicMaterial({
-  color: 0x00ffff,
-  wireframe: false,
-});
-
-//オブジェクト
-const mesh = new THREE.Mesh(geometry, materila);
-scene.add(mesh);
-
 //カメラ
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-
-camera.position.z = 3;
-scene.add(camera);
+const camera = new THREE.PerspectiveCamera(
+  75,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.set(1, 1, 2);
 
 //レンダラー
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 
-//カメラ制御
+/**
+ * テクスチャ設定
+ * /
+
+/**
+ * パーティクルを作ってみよう
+ */
+const particlesGeometry = new THREE.SphereGeometry(1, 16, 32);
+const pointMaterial = new THREE.PointsMaterial({
+  size: 0.02,
+});
+const particles = new THREE.Points(particlesGeometry, pointMaterial)
+scene.add(particles);
+
+//マウス操作
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-//アニメーション
-const animate = () => {
+
+window.addEventListener("resize", onWindowResize);
+
+const clock = new THREE.Clock();
+
+function animate() {
+  const elapsedTime = clock.getElapsedTime();
+
   controls.update();
-  
+
   //レンダリング
   renderer.render(scene, camera);
-  window.requestAnimationFrame(animate);
-};
+  requestAnimationFrame(animate);
+}
+
+//ブラウザのリサイズに対応
+function onWindowResize() {
+  renderer.setSize(sizes.width, sizes.height);
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+}
 
 animate();
