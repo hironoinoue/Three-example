@@ -1,69 +1,54 @@
-import * as THREE from "./build/three.module.js";
-import { OrbitControls } from "./jsm/controls/OrbitControls.js";
-let scene, camera, renderer;
-let sphere;
+import * as THREE from "three";
+//import { OrbitControls } from "./jsm/controls/OrbitControls.js";
 
-window.addEventListener("DOMContentLoaded", init);
+let cursorX = 0;
+let cursorY = 0;
+window.addEventListener("mousemove", (event) => {
+  cursorX = event.clientX / sizes.width - 0.5;
+  cursorY = event.clientY / sizes.height - 0.5;
+  camera.lookAt(mesh.position);
+});
 
-function init() {
-  const width = innerWidth;
-  const height = innerHeight;
+//サイズ
+const sizes = {
+  width: 800,
+  height: 600,
+};
 
-  // シーン
-  scene = new THREE.Scene();
-  // カメラ（レクチャー部分）
-  //camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
-  //camera.position.z = 350;
-  const aspectRatio = width / height;
-  camera = new THREE.OrthographicCamera(500 * aspectRatio, -500 * aspectRatio, -500, 500, 0.1, 3000);
-  
+//シーン
+const scene = new THREE.Scene();
 
+const geometry = new THREE.BoxGeometry(1, 1, 1, 5, 5, 5);
+const materila = new THREE.MeshBasicMaterial({
+  color: 0x00ffff,
+  wireframe: false,
+});
 
-  // レンダラー
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height);
-  document.body.appendChild(renderer.domElement);
+//オブジェクト
+const mesh = new THREE.Mesh(geometry, materila);
+scene.add(mesh);
 
-  // 座標軸を表示
-  const axes = new THREE.AxesHelper(1500);
-  axes.position.x = 0;
-  scene.add(axes); //x 軸は赤, y 軸は緑, z 軸は青
+//カメラ
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 
-  // ボックスを作成
-  const geometry = new THREE.SphereGeometry(200, 64, 32);
-  //const material = new THREE.MeshBasicMaterial({
-   // color: 0xc7ebb,
-    //wireframe: true,
-  //});
+camera.position.z = 3;
+scene.add(camera);
 
-  const material = new THREE.MeshNormalMaterial();
-  material.wireframe = true;
-  
-  sphere = new THREE.Mesh(geometry, material);
-  scene.add(sphere);
+//レンダラー
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(sizes.width, sizes.height);
+document.body.appendChild(renderer.domElement);
 
-  //マウス操作
-  new OrbitControls(camera, renderer.domElement);
-
-  window.addEventListener("resize", onWindowResize);
-  animate();
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  sphere.rotation.x += 0.01;
-  sphere.rotation.y += 0.01;
-
-  // レンダリング
+//アニメーション
+const animate = () => {
+  // camera.position.x = cursorX * 3;
+  // camera.position.y = cursorY * 3;
+ camera.position.x = Math.sin(Math.PI * 2 * cursorX) * 3;
+ camera.position.z = Math.cos(Math.PI * 2 * cursorX) * 3;
+ camera.position.y = cursorY * 5;
+  //レンダリング
   renderer.render(scene, camera);
-}
+  window.requestAnimationFrame(animate);
+};
 
-
-function onWindowResize() {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-}
+animate();
