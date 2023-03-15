@@ -58,10 +58,7 @@ particlesGeometry.setAttribute(
   new THREE.BufferAttribute(colorArray, 3),
 );
 
-const cube = new THREE.Mesh(
-  new THREE.SphereGeometry(),
-  new THREE.MeshNormalMaterial()
-);
+
 
 const pointMaterial = new THREE.PointsMaterial({
   size: 0.15,
@@ -77,7 +74,7 @@ const pointMaterial = new THREE.PointsMaterial({
 //pointMaterial.color.set("red");
 
 const particles = new THREE.Points(particlesGeometry, pointMaterial)
-scene.add(particles, cube);
+scene.add(particles);
 
 //マウス操作
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -87,10 +84,20 @@ window.addEventListener("resize", onWindowResize);
 
 const clock = new THREE.Clock();
 
+
 function animate() {
   const elapsedTime = clock.getElapsedTime();
 
   controls.update();
+
+  for(let i = 0; i < count; i++) {
+    const i3 = i * 3;
+
+    const x = particlesGeometry.attributes.position.array[i3 + 0] 
+    particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x);
+  }
+
+  particlesGeometry.attributes.position.needsUpdate = true;
 
   //レンダリング
   renderer.render(scene, camera);
